@@ -1,0 +1,55 @@
+name: Java CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Check if build.gradle exists
+      id: check-solution
+      run: |
+        if [ ! -f "build.gradle" ]; then
+          echo "Solution not present."
+          exit 1
+        fi
+        
+    - name: Cache Gradle packages
+      if: success()
+      uses: actions/cache@v3
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Build with Gradle
+      if: success()
+      run: ./gradlew build
+
+    - name: Run tests
+      if: success()
+      run: ./gradlew test
+
+    - name: Upload test results
+      if: success()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: build/reports/tests/test/
