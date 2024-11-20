@@ -1,4 +1,4 @@
-package main.java.com.gproject.controllers;
+package com.gproject.controllers;
 
 import com.gproject.entities.User;
 import com.gproject.services.UserService;

@@ -1,4 +1,4 @@
-package main.java.com.gproject.repositories;
+package com.gproject.repositories;
 
 import com.gproject.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;

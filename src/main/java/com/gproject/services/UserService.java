@@ -1,4 +1,4 @@
-package main.java.com.gproject.services;
+package com.gproject.services;
 
 import com.gproject.entities.User;
 import com.gproject.repositories.UserRepository;

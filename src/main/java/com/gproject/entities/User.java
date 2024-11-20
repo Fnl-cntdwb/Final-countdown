@@ -1,4 +1,4 @@
-package main.java.com.gproject.entities;
+package com.gproject.entities;
 
 import jakarta.persistence.*;
 
