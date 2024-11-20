@@ -1,4 +1,4 @@
-package main.java.com.gproject;
+package com.gproject;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
