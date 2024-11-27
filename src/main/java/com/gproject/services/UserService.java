@@ -28,4 +28,3 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 }
-

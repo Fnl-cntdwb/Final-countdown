@@ -13,10 +13,6 @@ target/
 .springBeans
 .sts4-cache
 
-### PostgreSQL ###
-
-.env
-
 ### IntelliJ IDEA ###
 .idea
 *.iws
