@@ -27,7 +27,6 @@ public class Education {
     @JoinColumn(name = "cv_id", nullable = false)
     private CVData cvData;
 
-    // Getters and setters
     public Integer getEducationId() {
         return educationId;
     }
