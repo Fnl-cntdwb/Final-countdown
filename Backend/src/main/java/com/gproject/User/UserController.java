@@ -2,6 +2,7 @@ package com.gproject.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,16 +13,16 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    @PostMapping("/register")
+    public ResponseEntity<User> register(@RequestBody User user) {
         User createdUser = userService.createUser(user);
         return ResponseEntity.ok(createdUser);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Integer id) {
-        User user = userService.getUserById(id);
-        return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+    @PostMapping("/login")
+    public ResponseEntity<User> login(@RequestParam String username, @RequestParam String password) {
+        User user = userService.authenticate(username, password);
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping
@@ -31,7 +32,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUserById(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
         userService.deleteUserById(id);
         return ResponseEntity.noContent().build();
     }
