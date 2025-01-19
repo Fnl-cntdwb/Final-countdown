@@ -2,7 +2,6 @@ package com.gproject.User;
 
 import com.gproject.CV.CVData;
 import jakarta.persistence.*;
-
 import java.util.List;
 
 @Entity
@@ -13,10 +12,10 @@ public class User {
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name = "username", nullable = false, length = 40)
+    @Column(name = "username", nullable = false, unique = true, length = 40)
     private String username;
 
-    @Column(name = "password", nullable = false, length = 30)
+    @Column(name = "password", nullable = false)
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
