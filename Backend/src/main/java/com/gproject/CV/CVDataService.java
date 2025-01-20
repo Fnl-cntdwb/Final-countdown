@@ -3,8 +3,6 @@ package com.gproject.CV;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class CVDataService {
 
@@ -19,11 +17,20 @@ public class CVDataService {
         return cvDataRepository.findById(cvId).orElse(null);
     }
 
-    public List<CVData> getCVsByUserId(Integer userId) {
-        return cvDataRepository.findByUserUserId(userId);
+    public CVData getCVByUsername(String username) {
+        return cvDataRepository.findByUserUsername(username);
     }
 
     public void deleteCVById(Integer cvId) {
         cvDataRepository.deleteById(cvId);
+    }
+
+    public CVData updateCV(Integer cvId, CVData updatedData) {
+        return cvDataRepository.findById(cvId)
+                .map(cv -> {
+                    cv.setCanvasData(updatedData.getCanvasData());
+                    return cvDataRepository.save(cv);
+                })
+                .orElse(null);
     }
 }

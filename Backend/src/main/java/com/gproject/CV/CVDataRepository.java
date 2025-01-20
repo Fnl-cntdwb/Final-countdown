@@ -3,9 +3,7 @@ package com.gproject.CV;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface CVDataRepository extends JpaRepository<CVData, Integer> {
-    List<CVData> findByUserUserId(Integer userId);
+    CVData findByUserUsername(String username);
 }

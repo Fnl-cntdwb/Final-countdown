@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/cv-data")
 public class CVDataController {
@@ -25,15 +23,21 @@ public class CVDataController {
         return cvData != null ? ResponseEntity.ok(cvData) : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<CVData>> getCVsByUserId(@PathVariable Integer userId) {
-        List<CVData> cvDataList = cvDataService.getCVsByUserId(userId);
-        return ResponseEntity.ok(cvDataList);
+    @GetMapping("/username")
+    public ResponseEntity<CVData> getCVByUsername(@RequestParam String username) {
+        CVData cvData = cvDataService.getCVByUsername(username);
+        return cvData != null ? ResponseEntity.ok(cvData) : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCVById(@PathVariable Integer id) {
         cvDataService.deleteCVById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CVData> updateCV(@PathVariable Integer id, @RequestBody CVData updatedData) {
+        CVData updatedCV = cvDataService.updateCV(id, updatedData);
+        return updatedCV != null ? ResponseEntity.ok(updatedCV) : ResponseEntity.notFound().build();
     }
 }

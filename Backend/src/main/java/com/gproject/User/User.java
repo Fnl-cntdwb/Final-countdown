@@ -2,7 +2,6 @@ package com.gproject.User;
 
 import com.gproject.CV.CVData;
 import jakarta.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "user_")
@@ -12,14 +11,14 @@ public class User {
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name = "username", nullable = false, unique = true, length = 40)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
     @Column(name = "password", nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CVData> cvs;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private CVData cv;
 
     // Getters and Setters
     public Integer getUserId() {
@@ -46,11 +45,11 @@ public class User {
         this.password = password;
     }
 
-    public List<CVData> getCvs() {
-        return cvs;
+    public CVData getCv() {
+        return cv;
     }
 
-    public void setCvs(List<CVData> cvs) {
-        this.cvs = cvs;
+    public void setCv(CVData cv) {
+        this.cv = cv;
     }
 }

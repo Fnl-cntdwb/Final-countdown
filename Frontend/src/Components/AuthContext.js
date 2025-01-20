@@ -1,33 +1,53 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import axios from "axios";
 
 export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const [users, setUsers] = useState([{ login: 'admin', password: 'admin' }]);
-  const [currentUser, setCurrentUser] = useState(null); // Store the logged in user
+  const [currentUser, setCurrentUser] = useState(null);
 
-  const register = (login, password) => {
-    setUsers([...users, { login, password }]);
+  const register = async (username, password) => {
+    try {
+      const response = await axios.post('/users/register', {
+        username,
+        password,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Registration error:', error);
+      return null;
+    }
   };
 
-  const login = (login, password) => {
-    const user = users.find((u) => u.login === login && u.password === password);
-    if (user) {
-      setCurrentUser(user);
+  const login = async (username, password) => {
+    try {
+      const response = await axios.post('/users/login', {
+        username,
+        password,
+      });
+      setCurrentUser(response.data);
       return true;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
     }
-    return false;
   };
 
   const logout = () => {
+    localStorage.removeItem("token");
     setCurrentUser(null);
   };
 
+  const getToken = () => localStorage.getItem("token");
+
   return (
-    <AuthContext.Provider value={{ users, currentUser, register, login, logout }}>
+    <AuthContext.Provider
+      value={{ currentUser, login, register, logout, getToken }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
 export default AuthProvider;
+export const useAuth = () => useContext(AuthContext);

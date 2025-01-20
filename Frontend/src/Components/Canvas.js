@@ -4,9 +4,13 @@ import Toolbar from "./Toolbar";
 import DraggableField from "./DraggableField";
 import Sidebar from "./Sidebar";
 import { jsPDF } from "jspdf";
+import { useAuth } from './AuthContext'; 
+import axios from "axios";
 
 const Canvas = () => {
+  const { currentUser } = useAuth();
   const [items, setItems] = useState([]);
+  const [cvId, setCvId] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -17,6 +21,78 @@ const Canvas = () => {
   const [selectionMode, setSelectionMode] = useState(true);
   const canvasRef = useRef(null);
   const [ctrlPressed, setCtrlPressed] = useState(false);
+
+  useEffect(() => {
+    const fetchCVId = async () => {
+        if (!currentUser || !currentUser.username) return;
+
+        try {
+            const response = await axios.get(`/cv-data/username`, {
+                params: { username: currentUser.username },
+            });
+
+            if (response.data && response.data.cvId) {
+                setCvId(response.data.cvId);
+            } else {
+                console.error('CV data does not contain an ID');
+                setCvId(null);
+            }
+        } catch (error) {
+            console.error('Failed to fetch CV data:', error);
+            setCvId(null);
+        }
+    };
+
+    fetchCVId();
+}, [currentUser]);
+
+  useEffect(() => {
+    const saveCanvasData = async () => {
+        if (!cvId) return;
+        try {
+            const response = await fetch(`/cv-data/${cvId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ canvasData: JSON.stringify(items) }),
+            });
+            if (!response.ok) {
+                console.error("Failed to save canvas data");
+            }
+        } catch (error) {
+            console.error("Error saving canvas data", error);
+        }
+    };
+
+    if (cvId) {
+        const interval = setInterval(saveCanvasData, 10000); // Save every 10 seconds
+        return () => clearInterval(interval);
+    }
+}, [items, cvId]);
+
+
+useEffect(() => {
+  const fetchCanvasData = async () => {
+      if (!cvId) return;
+      try {
+          const response = await fetch(`/cv-data/${cvId}`);
+          if (response.ok) {
+              const data = await response.json();
+              if (data.canvasData) {
+                  setItems(JSON.parse(data.canvasData));
+              }
+          } else {
+              console.error("Failed to fetch canvas data");
+          }
+      } catch (error) {
+          console.error("Error fetching canvas data", error);
+      }
+  };
+
+  if (cvId) fetchCanvasData();
+}, [cvId]);
+
 
   useEffect(() => {
     const handleKeyDown = (e) => {
