@@ -20,6 +20,6 @@ Pre-fetches dependencies for offline use.
 
 Installs dependencies without running tests.
 
-## `mvn dependency:tree`
+### `mvn dependency:tree`
 
 Displays dependency tree
