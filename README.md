@@ -2,7 +2,11 @@
 
 To compile the application and run it without using an IDE, maven must be installed and correctly added to your environment variable.
 
-To install and add maven to environment variable visit [(https://mkyong.com/maven/how-to-install-maven-in-windows/)]
+To install and add maven to environment variable visit [(https://mkyong.com/maven/how-to-install-maven-in-windows/)].
+
+Navigate to the root of the project via command line and execute the command
+
+### mvn spring-boot:run
 
 ## Available in-IDE Scripts
 
