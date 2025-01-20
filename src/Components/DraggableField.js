@@ -116,25 +116,6 @@ const DraggableField = ({ item, isSelected, onSelect, updateItem, updateSelected
             whiteSpace: "pre-wrap",
             outline: "none",
           }}
-          onInput={(e) => handleFieldChange("content", e.target.innerText)}
-          suppressContentEditableWarning={true}
-        >
-          {content}
-        </div>
-      )}
-
-      {/* Render list title */}
-      {type === "list" && (
-        <div
-          style={{
-            fontSize: fontSize + 4, // Title larger than text
-            fontFamily,
-            fontWeight: "bold", // Made bold for emphasis
-            color,
-            marginBottom: "5px",
-            textAlign,
-          }}
-          contentEditable
           suppressContentEditableWarning={true}
           onBlur={(e) => handleFieldChange("content", e.target.innerText)}
         >
@@ -142,18 +123,39 @@ const DraggableField = ({ item, isSelected, onSelect, updateItem, updateSelected
         </div>
       )}
 
+        {/* Render list title */}
+        {type === "list" && (
+          <div
+            style={{
+              fontSize: fontSize + 4, // Title larger than text
+              fontFamily,
+              fontWeight: "bold", // Made bold for emphasis
+              color,
+              marginBottom: "5px",
+              textAlign,
+            }}
+            contentEditable
+            suppressContentEditableWarning={true}
+            onBlur={(e) => handleFieldChange("title", e.target.innerText)} // save to 'title'
+          >
+            {title || "List Title..."}
+          </div>
+        )}
+
       {/* Render list description */}
       {type === "list" && (
         <div
           style={{
-            fontSize,
+            fontSize: `${fontSize}px`,
             fontFamily,
             fontWeight,
             fontStyle,
             fontUnderline,
-            color: color || "#555", // Lighter color
-            marginBottom: "10px",
+            color,
             textAlign,
+            overflowWrap: "break-word",
+            whiteSpace: "pre-wrap",
+            outline: "none",
           }}
           contentEditable
           suppressContentEditableWarning={true}
