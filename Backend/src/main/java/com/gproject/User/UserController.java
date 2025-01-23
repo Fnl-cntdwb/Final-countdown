@@ -4,10 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -24,15 +22,9 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
-        userService.deleteUserById(id);
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteUser(@RequestParam User user) {
+        userService.deleteUser(user);
         return ResponseEntity.noContent().build();
     }
 }
