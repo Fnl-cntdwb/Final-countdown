@@ -46,48 +46,41 @@ const Canvas = () => {
     fetchCVId();
 }, [currentUser]);
 
-  useEffect(() => {
-    const saveCanvasData = async () => {
-        if (!cvId) return;
-        try {
-            const response = await fetch(`http://localhost:8080/cv-data/${cvId}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ canvasData: JSON.stringify(items) }),
-            });
-            if (!response.ok) {
-                console.error("Failed to save canvas data");
-            }
-        } catch (error) {
-            console.error("Error saving canvas data", error);
-        }
-    };
+useEffect(() => {
+  const saveCanvasData = async () => {
+      if (!cvId) return;
+      try {
+          const response = await axios.put(`http://localhost:8080/cv-data/${cvId}`, {
+              canvasData: JSON.stringify(items),
+          });
 
-    if (cvId) {
-        const interval = setInterval(saveCanvasData, 10000); // Save every 10 seconds
-        return () => clearInterval(interval);
-    }
+          if (response.status !== 200) {
+              console.error("Failed to save canvas data");
+          }
+      } catch (error) {
+          console.error("Error saving canvas data:", error.message);
+          console.error("Axios Error Details:", error.response || error.request || error.message);
+      }
+  };
+
+  if (cvId) {
+      const interval = setInterval(saveCanvasData, 10000); // Save every 10 seconds
+      return () => clearInterval(interval); // Cleanup interval on dependency change
+  }
 }, [items, cvId]);
 
 
 useEffect(() => {
   const fetchCanvasData = async () => {
-      if (!cvId) return;
-      try {
-          const response = await fetch(`http://localhost:8080/cv-data/${cvId}`);
-          if (response.ok) {
-              const data = await response.json();
-              if (data.canvasData) {
-                  setItems(JSON.parse(data.canvasData));
-              }
-          } else {
-              console.error("Failed to fetch canvas data");
-          }
-      } catch (error) {
-          console.error("Error fetching canvas data", error);
-      }
+    if (!cvId) return;
+    try {
+        const response = await axios.get(`http://localhost:8080/cv-data/${cvId}`);
+        if (response.data && response.data.canvasData) {
+            setItems(JSON.parse(response.data.canvasData));
+        }
+    } catch (error) {
+        console.error("Error fetching canvas data", error);
+    }
   };
 
   if (cvId) fetchCanvasData();

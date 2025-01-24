@@ -13,7 +13,7 @@ const SignupForm = ({ onClose }) => {
     return hasEightChars && hasUppercase && hasNumber;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match!');
@@ -25,9 +25,14 @@ const SignupForm = ({ onClose }) => {
       return;
     }
 
-    register(formData.login, formData.password);
-    login(formData.login, formData.password);
-    onClose();
+    try {
+      const response = await register(formData.login, formData.password); // Wait for register to complete
+      await login(formData.login, formData.password); // Wait for login to complete
+      onClose(); // Close once both are done
+    } catch (error) {
+      console.error("Error during registration or login:", error);
+      // Handle the error appropriately, e.g., show a notification to the user
+    }
   };
 
   return (

@@ -18,7 +18,7 @@ public class CVDataController {
     }
 
     @GetMapping("/username")
-    public ResponseEntity<CVData> getCVByUsername(@RequestParam String username) {
+    public ResponseEntity<CVData> getCVByUsername(@RequestParam("username") String username) {
         CVData cvData = cvDataService.getCVByUsername(username);
         return cvData != null ? ResponseEntity.ok(cvData) : ResponseEntity.notFound().build();
     }
@@ -33,5 +33,9 @@ public class CVDataController {
     public ResponseEntity<CVData> updateCV(@PathVariable Integer id, @RequestBody CVData updatedData) {
         CVData updatedCV = cvDataService.updateCV(id, updatedData);
         return updatedCV != null ? ResponseEntity.ok(updatedCV) : ResponseEntity.notFound().build();
+    }
+    @RequestMapping(value = "/**", method = RequestMethod.OPTIONS)
+    public ResponseEntity<?> handleOptions() {
+        return ResponseEntity.ok().build();
     }
 }

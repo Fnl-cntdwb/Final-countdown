@@ -17,14 +17,18 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<User> login(@RequestParam("username") String username, @RequestParam("password") String password) {
         User user = userService.authenticate(username, password);
         return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteUser(@RequestParam User user) {
+    public ResponseEntity<Void> deleteUser(@RequestBody User user) {
         userService.deleteUser(user);
         return ResponseEntity.noContent().build();
+    }
+    @RequestMapping(value = "/**", method = RequestMethod.OPTIONS)
+    public ResponseEntity<?> handleOptions() {
+        return ResponseEntity.ok().build();
     }
 }

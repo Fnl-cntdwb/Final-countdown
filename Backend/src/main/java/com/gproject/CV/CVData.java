@@ -1,5 +1,6 @@
 package com.gproject.CV;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gproject.User.User;
 import jakarta.persistence.*;
 
@@ -14,6 +15,7 @@ public class CVData {
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private User user;
 
     @Column(name = "canvas_data", columnDefinition = "TEXT")

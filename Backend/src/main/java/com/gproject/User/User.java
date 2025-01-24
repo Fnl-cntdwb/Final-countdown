@@ -1,5 +1,6 @@
 package com.gproject.User;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gproject.CV.CVData;
 import jakarta.persistence.*;
 
@@ -18,6 +19,7 @@ public class User {
     private String password;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private CVData cv;
 
     // Getters and Setters
