@@ -27,7 +27,7 @@ const Canvas = () => {
         if (!currentUser || !currentUser.username) return;
 
         try {
-            const response = await axios.get(`/cv-data/username`, {
+            const response = await axios.get(`http://localhost:8080/cv-data/username`, {
                 params: { username: currentUser.username },
             });
 
@@ -50,7 +50,7 @@ const Canvas = () => {
     const saveCanvasData = async () => {
         if (!cvId) return;
         try {
-            const response = await fetch(`/cv-data/${cvId}`, {
+            const response = await fetch(`http://localhost:8080/cv-data/${cvId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -76,7 +76,7 @@ useEffect(() => {
   const fetchCanvasData = async () => {
       if (!cvId) return;
       try {
-          const response = await fetch(`/cv-data/${cvId}`);
+          const response = await fetch(`http://localhost:8080/cv-data/${cvId}`);
           if (response.ok) {
               const data = await response.json();
               if (data.canvasData) {

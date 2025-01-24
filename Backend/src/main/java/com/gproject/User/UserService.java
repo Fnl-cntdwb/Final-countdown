@@ -37,16 +37,4 @@ public class UserService {
     public void deleteUser(User user) {
         userRepository.delete(user);
     }
-
-    public User setUserByUserId(Integer userId, User updatedUser) {
-        return userRepository.findById(userId)
-                .map(existingUser -> {
-                    existingUser.setUsername(updatedUser.getUsername());
-                    existingUser.setPassword(updatedUser.getPassword());
-                    existingUser.setCv(updatedUser.getCv());
-                    // Add other fields if necessary
-                    return userRepository.save(existingUser);
-                })
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
-    }
 }
