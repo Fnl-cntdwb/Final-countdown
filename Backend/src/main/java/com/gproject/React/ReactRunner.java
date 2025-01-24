@@ -3,15 +3,20 @@ package com.gproject.React;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 @Component
-public class ReactRunner implements CommandLineRunner {
+public class ReactRunner implements CommandLineRunner, DisposableBean {
 
     private static final Log logger = LogFactory.getLog(ReactRunner.class);
+    private static final int REACT_PORT = 3000; // Change to the port your React app uses
+    private Process reactProcess;
 
     @Override
     public void run(String... args) {
@@ -19,54 +24,99 @@ public class ReactRunner implements CommandLineRunner {
             File currentDir = new File(System.getProperty("user.dir"));
             File reactProjectDir = new File(currentDir.getParent(), "/Frontend");
 
-            // Run npm build to generate production build
-            ProcessBuilder buildProcessBuilder = new ProcessBuilder()
-                    .command("npm.cmd", "run", "build")
+            // Run npm install
+            ProcessBuilder installProcessBuilder = new ProcessBuilder()
+                    .command("npm.cmd", "install")
                     .directory(reactProjectDir)
                     .inheritIO();
+            Process installProcess = installProcessBuilder.start();
+            int installExitCode = installProcess.waitFor();
 
-            Process buildProcess = buildProcessBuilder.start();
-            int buildExitCode = buildProcess.waitFor();
-
-            if (buildExitCode != 0) {
-                logger.error("React build failed. Please check your npm configuration.");
+            if (installExitCode != 0) {
+                logger.error("npm install failed. Please check your npm configuration.");
                 return;
             }
 
-            File buildDir = new File(reactProjectDir, "build");
-            File staticDir = new File(currentDir, "/src/main/resources/static");
+            // Start React application
+            ProcessBuilder startProcessBuilder = new ProcessBuilder()
+                    .command("npm.cmd", "start")
+                    .directory(reactProjectDir)
+                    .inheritIO();
+            reactProcess = startProcessBuilder.start();
 
-            if (!staticDir.exists()) {
-                if (!staticDir.mkdirs()) {
-                    logger.error("Failed to create static directory.");
-                    return;
-                }
-            }
+            logger.info("React application started on port " + REACT_PORT + ". Press Ctrl+C or stop the Spring application to terminate.");
 
-            copyDirectory(buildDir, staticDir);
-            logger.info("React app built and copied to static resources folder successfully.");
         } catch (IOException | InterruptedException e) {
-            logger.error("Failed to build and serve React app.", e);
+            logger.error("Failed to start React app", e);
         }
     }
 
-    private void copyDirectory(File source, File destination) throws IOException {
-        if (source.isDirectory()) {
-            if (!destination.exists()) {
-                destination.mkdirs();
+    @Override
+    public void destroy() {
+        logger.info("Shutting down React application...");
+        terminateProcessOnPort(REACT_PORT);
+        if (reactProcess != null && reactProcess.isAlive()) {
+            reactProcess.destroy();
+            try {
+                if (!reactProcess.waitFor(5, TimeUnit.SECONDS)) {
+                    reactProcess.destroyForcibly();
+                }
+            } catch (InterruptedException e) {
+                logger.error("Error while waiting for React process to terminate", e);
+                Thread.currentThread().interrupt();
             }
-            String[] files = source.list();
-            if (files != null) {
-                for (String file : files) {
-                    copyDirectory(new File(source, file), new File(destination, file));
+        }
+        logger.info("React application terminated.");
+    }
+
+    private void terminateProcessOnPort(int port) {
+        try {
+            String command;
+            if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                // Windows: Find process using the port
+                command = "cmd.exe /c netstat -ano | findstr :" + port;
+            } else {
+                // Unix-like: Find process using the port
+                command = "bash -c \"lsof -i :" + port + " -t\"";
+            }
+
+            Process findProcess = new ProcessBuilder(command.split(" ")).start();
+            try (Scanner scanner = new Scanner(findProcess.getInputStream())) {
+                if (scanner.hasNextLine()) {
+                    String line = scanner.nextLine().trim();
+                    String pid;
+
+                    if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                        // Extract PID from netstat output
+                        String[] tokens = line.split("\\s+");
+                        pid = tokens[tokens.length - 1]; // PID is the last token
+                    } else {
+                        // On Unix-like systems, lsof outputs the PID directly
+                        pid = line;
+                    }
+
+                    logger.info("Found process using port " + port + " with PID: " + pid);
+
+                    // Kill the process by PID
+                    if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                        command = "cmd.exe /c taskkill /F /PID " + pid;
+                    } else {
+                        command = "bash -c \"kill -9 " + pid + "\"";
+                    }
+
+                    Process killProcess = new ProcessBuilder(command.split(" ")).start();
+                    killProcess.waitFor();
+                    logger.info("Terminated process with PID: " + pid + " on port: " + port);
+                } else {
+                    logger.warn("No process found using port " + port);
                 }
             }
-        } else {
-            java.nio.file.Files.copy(
-                    source.toPath(),
-                    destination.toPath(),
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING
-            );
+        } catch (IOException | InterruptedException e) {
+            logger.error("Failed to terminate process on port " + port, e);
+            Thread.currentThread().interrupt();
         }
     }
+
 }
+
+

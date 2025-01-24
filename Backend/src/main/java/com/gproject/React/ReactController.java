@@ -1,12 +1,12 @@
 package com.gproject.React;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class ReactController {
 
-    @RequestMapping(value = "/") // Matches everything except static file requests
+    @GetMapping("/")
     public String forwardToReact() {
         return "forward:/index.html";
     }

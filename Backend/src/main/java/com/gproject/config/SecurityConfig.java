@@ -11,12 +11,12 @@ public class SecurityConfig {
 
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .formLogin(form -> form.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/static/**", "/index.html", "/favicon.ico", "/manifest.json", "/**/*.css", "/**/*.js").permitAll()
+                        .requestMatchers("/", "/index.html", "/static/**", "/public/**", "/**/*.js", "/**/*.css").permitAll()
                         .anyRequest().authenticated()
                 )
-                .csrf(csrf -> csrf.disable());
+                .csrf(csrf -> csrf.disable())
+                .formLogin(form -> form.disable());
 
         return http.build();
     }
