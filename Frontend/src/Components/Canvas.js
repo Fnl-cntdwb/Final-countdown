@@ -10,7 +10,7 @@ import axios from "axios";
 const Canvas = () => {
   const { currentUser } = useAuth();
   const [items, setItems] = useState([]);
-  const [cvId, setCvId] = useState([]);
+  const [cvId, setCvId] = useState();
   const [selectedItems, setSelectedItems] = useState([]);
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);

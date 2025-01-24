@@ -11,12 +11,6 @@ public class CVDataController {
     @Autowired
     private CVDataService cvDataService;
 
-    @PostMapping
-    public ResponseEntity<CVData> createCV(@RequestBody CVData cvData) {
-        CVData createdCV = cvDataService.createCV(cvData);
-        return ResponseEntity.ok(createdCV);
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<CVData> getCVById(@PathVariable Integer id) {
         CVData cvData = cvDataService.getCVById(id);

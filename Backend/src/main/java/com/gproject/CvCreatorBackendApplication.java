@@ -9,3 +9,4 @@ public class CvCreatorBackendApplication {
 		SpringApplication.run(CvCreatorBackendApplication.class, args);
 	}
 }
+

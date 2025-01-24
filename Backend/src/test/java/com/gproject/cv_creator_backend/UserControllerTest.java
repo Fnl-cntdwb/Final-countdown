@@ -12,7 +12,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,17 +28,29 @@ public class UserControllerTest {
 
     @Test
     void testRegisterUser() throws Exception {
-        User mockUser = new User();
+        // Create a user object to simulate input
+        User inputUser = new User();
+        inputUser.setUsername("testuser");
+        inputUser.setPassword("password123");
 
-        Mockito.when(userService.createUser(any(User.class))).thenReturn(mockUser);
+        // Simulate the returned user with userId populated
+        User returnedUser = new User();
+        returnedUser.setUserId(1);
+        returnedUser.setUsername("testuser");
+        returnedUser.setPassword("password123");
 
+        // Mock the service to return the saved user
+        Mockito.when(userService.createUser(Mockito.any(User.class))).thenReturn(returnedUser);
+
+        // Perform the mock request
         mockMvc.perform(post("/user/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\":\"testuser\", \"password\":\"password123\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("testuser"))
-                .andExpect(jsonPath("$.password").value(1));
+                .andExpect(jsonPath("$.userId").value(1))
+                .andExpect(jsonPath("$.username").value("testuser"));
     }
+
 
     @Test
     void testLogin() throws Exception {

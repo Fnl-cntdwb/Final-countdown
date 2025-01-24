@@ -8,7 +8,7 @@ const AuthProvider = ({ children }) => {
 
   const register = async (username, password) => {
     try {
-      const response = await axios.post('/users/register', {
+      const response = await axios.post('/user/register', {
         username,
         password,
       });
@@ -21,17 +21,21 @@ const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post('/users/login', {
+      const response = await axios.post('/user/login', {
         username,
         password,
       });
+      if (response.status !== 200) {
+        console.error('Login failed: Status not OK');
+        return null;
+      }
       setCurrentUser(response.data);
-      return true;
+      return response.data;
     } catch (error) {
       console.error('Login error:', error);
-      return false;
+      return null;
     }
-  };
+};
 
   const logout = () => {
     setCurrentUser(null);
