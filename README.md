@@ -4,7 +4,7 @@ To compile the application and run it without using an IDE, maven must be instal
 
 To install and add maven to environment variable visit [(https://mkyong.com/maven/how-to-install-maven-in-windows/)].
 
-Navigate to the root of the project via command line and execute the command
+Navigate to the root of the project and then - to the "Backend" folder via command line, and execute the command
 
 ### mvn spring-boot:run
 
