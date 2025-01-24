@@ -202,71 +202,108 @@ useEffect(() => {
   };
 
     const exportToPDF = () => {
-      const doc = new jsPDF();
+        const doc = new jsPDF();
 
-      // Width and height of an A4 sheet in pt (default for jsPDF)
-      const a4Width = 210; // mm -> pt
-      const a4Height = 297; // mm -> pt
+        items.forEach((item) => {
+            const itemX = item.x / 3.7795275591; // Conversion from px to mm
+            const itemY = item.y / 3.7795275591;
+            const itemWidth = item.width / 3.7795275591;
 
-      // Ensure all elements are rendered correctly
-      items.forEach((item) => {
-        const itemX = item.x / 3.7795275591; // Convert px -> pt
-        const itemY = item.y / 3.7795275591; // Convert px -> pt
-        const itemWidth = item.width / 3.7795275591; // Convert px -> pt
-        const itemHeight = item.height / 3.7795275591; // Convert px -> pt
+            // Render text
+            if (item.type === "text") {
+                const fontStyle = (item.fontWeight === "bold" ? "bold" : "normal") +
+                                  (item.fontStyle === "italic" ? "italic" : "");
+                doc.setFont(item.fontFamily || "Arial", fontStyle.trim());
+                doc.setFontSize(item.fontSize || 16);
+                doc.setTextColor(item.color || "#000000");
 
-        if (item.type === "text") {
-          // Handling text
-          doc.setFontSize(item.fontSize / 3.7795275591 * 2.8346456693); // Convert font size to pt
-          doc.setFont(item.fontFamily, item.fontStyle || "normal");
-          doc.setTextColor(item.color || "#000000");
-          doc.text(item.content, itemX, itemY, { align: item.textAlign });
-        } else if (item.type === "photo" && item.image) {
-          // Handling images
-          try {
-            doc.addImage(item.image, "JPEG", itemX, itemY, itemWidth, itemHeight);
-          } catch (e) {
-            console.error("Error adding image to PDF: ", e);
-          }
-        } else if (item.type === "list") {
-          // Handling list
-          let currentY = itemY; // Start at the specified position
+                if (item.textAlign === "center") {
+                    const centerX = itemX + (itemWidth / 2);
+                    doc.text(item.content || "", centerX, itemY, { align: "center" });
+                } else if (item.textAlign === "right") {
+                    const rightX = itemX + itemWidth;
+                    doc.text(item.content || "", rightX, itemY, { align: "right" });
+                } else {
+                    doc.text(item.content || "", itemX, itemY, { align: "left" });
+                }
+            }
 
-          // Render list title
-          if (item.title) {
-            doc.setFontSize((item.fontSize + 4) / 3.7795275591 * 2.8346456693); // Larger font size for title
-            doc.setFont(item.fontFamily, "bold");
-            doc.setTextColor(item.color || "#000000");
-            doc.text(item.title, itemX, currentY);
-            currentY += 12; // Move Y downwards
-          }
+            // Render image
+            if (item.type === "photo" && item.image) {
+                try {
+                    doc.addImage(item.image, "JPEG", itemX, itemY, itemWidth, item.height / 3.7795275591);
+                } catch (e) {
+                    console.error("Error adding image:", e);
+                }
+            }
 
-          // Render list description (if available)
-          if (item.description) {
-            doc.setFontSize(item.fontSize / 3.7795275591 * 2.8346456693);
-            doc.setTextColor(item.color || "#555555"); // Slightly lighter color
-            doc.text(item.description, itemX, currentY);
-            currentY += 10; // Move Y downwards
-          }
+            // Render list
+            if (item.type === "list") {
+                let currentY = itemY;
 
-          // Render items from subFields
-          if (Array.isArray(item.subFields) && item.subFields.length > 0) {
-            doc.setFontSize(item.fontSize / 3.7795275591 * 2.8346456693);
-            doc.setFont(item.fontFamily, "normal");
-            doc.setTextColor(item.color || "#000000");
+                if (item.title && item.title.trim() !== "") {
+                    // Font and style for the title
+                    doc.setFont(item.fontFamily || "Arial", "bold"); // Explicitly setting bold here
+                    doc.setFontSize((item.fontSize || 16) + 4); // Optionally increase the size
+                    doc.setTextColor(item.color || "#000000");
 
-            item.subFields.forEach((field, index) => {
-              const bullet = `${index + 1}. `;
-              const content = `${bullet}${field.name || "No title"} - ${field.description || "No description"}`;
-              doc.text(content, itemX, currentY);
-              currentY += 10; // Move Y for the next list item
-            });
-          }
-        }
-      });
+                    const titleX =
+                        item.textAlign === "center"
+                            ? itemX + itemWidth / 2
+                            : item.textAlign === "right"
+                            ? itemX + itemWidth
+                            : itemX;
 
-      // Save the PDF
-      doc.save("canvas.pdf");
+                    doc.text(item.title, titleX, currentY, { align: item.textAlign || "left" });
+                    currentY += 10;
+                }
+
+                if (item.description && item.description.trim() !== "") {
+                    const descriptionFontStyle = (item.fontWeight === "bold" ? "bold" : "normal") +
+                                                 (item.fontStyle === "italic" ? "italic" : "");
+                    doc.setFont(item.fontFamily || "Arial", descriptionFontStyle.trim());
+                    doc.setFontSize(item.fontSize || 16);
+                    doc.setTextColor(item.color || "#555555");
+
+                    const descriptionX =
+                        item.textAlign === "center"
+                            ? itemX + itemWidth / 2
+                            : item.textAlign === "right"
+                            ? itemX + itemWidth
+                            : itemX;
+
+                    doc.text(item.description, descriptionX, currentY, { align: item.textAlign || "left" });
+                    currentY += 10;
+                }
+
+                if (Array.isArray(item.subFields) && item.subFields.length > 0) {
+                    const subFieldFontStyle = (item.fontWeight === "bold" ? "bold" : "normal") +
+                                              (item.fontStyle === "italic" ? "italic" : "");
+                    doc.setFont(item.fontFamily || "Arial", subFieldFontStyle.trim());
+                    doc.setFontSize(item.fontSize || 14);
+                    doc.setTextColor(item.color || "#000000");
+
+                    item.subFields.forEach((subField, index) => {
+                        const bullet = `${index + 1}. `;
+                        const content = `${bullet}${subField.name || ""} - ${
+                            subField.description || ""
+                        }`;
+
+                        const listItemX =
+                            item.textAlign === "center"
+                                ? itemX + itemWidth / 2
+                                : item.textAlign === "right"
+                                ? itemX + itemWidth
+                                : itemX;
+
+                        doc.text(content, listItemX, currentY, { align: item.textAlign || "left" });
+                        currentY += 7;
+                    });
+                }
+            }
+        });
+
+        doc.save("canvas.pdf");
     };
 
   const [, dropRef] = useDrop({
