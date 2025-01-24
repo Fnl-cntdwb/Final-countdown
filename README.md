@@ -31,3 +31,6 @@ Installs dependencies without running tests.
 ### `mvn dependency:tree`
 
 Displays dependency tree
+
+
+The version of Java to compile the project should be 17.
